@@ -1,0 +1,23 @@
+{
+  "name": "voting",
+  "version": "1.0.0",
+  "description": "voting permissioned dapp",
+  "license": "ISC",
+  "author": "Spencer LEe",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.12.2",
+    "@hyperledger/fabric-gateway": "^1.7.0",
+    "fabric-network": "^2.2.19",
+    "fabric-ca-client": "^2.2.19"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.5.0",
+    "eslint": "^9.5.0",
+    "globals": "^15.6.0"
+  }
+}
