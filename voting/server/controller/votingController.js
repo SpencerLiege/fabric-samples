@@ -149,7 +149,7 @@ const vote = async (req, res) => {
 }
 
 //@desc This function gets the results of an election
-// @route POST /api/voting/getElectionResults
+// @route POST /api/voting/getElectionResults/:electionId
 // @access Public
 // @param {String} electionId the ID of the election
 const getElectionResults = async (req, res) => {
