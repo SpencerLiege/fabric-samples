@@ -96,3 +96,51 @@ const endElection = async (req, res) => {
         })
     }
 }
+
+const vote = async (req, res) => {
+    const { candidateId, electionId, voterId } = req.body
+
+    try {
+       const { gateway, contract } = await connectToNetwork()
+        const result = await contract.submitTransaction('vote', candidateId, electionId, voterId) 
+        await gateway.disconnect()
+        res.status(200).json({
+            message: `Vote for candidate ${candidateId} in election ${electionId} by voter ${voterId} submitted successfully`, 
+            result: JSON.parse(result.toString()) 
+        })
+    } catch (error) {
+        console.error(`Failed to submit vote: ${error}`)
+        res.status(500).json({
+            error: `Failed to submit vote: ${error.message}`
+        })
+    }
+}
+
+const getElectionResults = async (req, res) => {
+    const { electionId } = req.params
+
+    try {
+        const { gateway, contract } = await connectToNetwork()
+        const result = await contract.evaluateTransaction('getElectionResults', electionId)
+        await gateway.disconnect()
+        res.status(200).json({
+            message: `Election results for ${electionId} retrieved successfully`, 
+            result: JSON.parse(result.toString()) 
+        })
+    } catch (error) {
+        console.error(`Failed to get election results: ${error}`)
+        res.status(500).json({
+            error: `Failed to get election results: ${error.message}`
+        })
+    }
+}
+
+export { 
+    registerVoter,
+    authenticateVoter,
+    createElection,
+    addCandidate,
+    endElection,
+    vote,
+    getElectionResults
+}
