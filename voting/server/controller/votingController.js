@@ -1,7 +1,12 @@
 import connectToNetwork from "../../application/app"
 
 
-// This function registers the voter
+//@desc This function registers the voter
+// @route POST /api/voting/registerVoter
+// @access Private
+// @param {String} userId the ID of the voter
+// @param {String} secretPass the secret pass of the voter
+// @param {String} adminId the ID of the admin
 const registerVoter = async (req, res) => {
     const { userId, secretPass, adminId } = req.body
 
@@ -21,6 +26,11 @@ const registerVoter = async (req, res) => {
     }
 }
 
+//@desc This function authenticates the voter
+// @route POST /api/voting/authenticateVoter
+// @access Public
+// @param {String} userId the ID of the voter
+// @param {String} secretPass the secret pass of the voter
 const authenticateVoter = async (req, res) => {
     const { userId, secretPass } = req.body
 
@@ -40,6 +50,11 @@ const authenticateVoter = async (req, res) => {
     }
 }
 
+//@desc This function creates the a new election
+// @route POST /api/voting/createElection
+// @access Private
+// @param {String} electionName the name of the election
+// @param {String} adminId the ID of the admin
 const createElection = async (req, res) => {
     const { electionName, adminId } = req.body
 
@@ -59,8 +74,14 @@ const createElection = async (req, res) => {
     }
 }
 
+//@desc This function adds a new candidate to an election
+// @route POST /api/voting/addCandidate
+// @access Private
+// @param {String} electionId the ID of the election
+// @param {String} candidateName the name of the candidate
+// @param {String} adminId the ID of the admin
 const addCandidate = async (req, res) => {
-    const { electionName, candidateId, candidateName, adminId } = req.body
+    const { electionId, candidateName, adminId } = req.body
 
     try {
         const { gateway, contract } = await connectToNetwork()
@@ -78,6 +99,11 @@ const addCandidate = async (req, res) => {
     }
 }
 
+//@desc This function starts an election
+// @route POST /api/voting/startElection
+// @access Private
+// @param {String} electionId the ID of the election
+// @param {String} adminId the ID of the admin
 const endElection = async (req, res) => {
     const { electionId, adminId } = req.body
 
@@ -97,6 +123,12 @@ const endElection = async (req, res) => {
     }
 }
 
+//@desc This function allows a user to vote for a candidate
+// @route POST /api/voting/vote
+// @access Public
+// @param {String} electionId the ID of the election
+// @param {String} candidateId the ID of the candidate
+// @param {String} voterId the ID of the voter
 const vote = async (req, res) => {
     const { candidateId, electionId, voterId } = req.body
 
@@ -116,6 +148,10 @@ const vote = async (req, res) => {
     }
 }
 
+//@desc This function gets the results of an election
+// @route POST /api/voting/getElectionResults
+// @access Public
+// @param {String} electionId the ID of the election
 const getElectionResults = async (req, res) => {
     const { electionId } = req.params
 
