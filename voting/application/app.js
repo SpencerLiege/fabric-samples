@@ -4,17 +4,32 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import grpc from '@grpc/grpc-js'
-import { connect, hash, signers } from '@hyperledger/fabric-gateway'
-import crypto from 'node:crypto'
-import fs from 'node:fs/promises'
-import path from 'node:path'
-import { TextDecoder } from 'node:util'
+import { Gateway, Wallets } from 'fabric-network';
+import path from 'path';
+import fs from 'fs';
 
-import { Gateway, Wallets } from 'fabric-network'
-
-const channelName = envOrDefault('CHANNEL_NAME', 'voting')
-const chaincodeName = envOrDefault('CHAINCODE_NAME', 'voting')
-const mspId = envOrDefault('MSP_ID', 'Org1MSP')
+// Load connection profile
+const ccpPath = path.resolve('../../test-network/organizations/peerOrganizations/org1.example.com/connection-org1.json') // <-- replace with your connection profile path
+const ccp = JSON.parse(fs.readFileSync(ccpPath, 'utf8'))
 
 
+// Connect to Fabric Network
+async function connectToNetwork(userId) {
+    const walletPath = path.join(process.cwd(), 'wallet') // <-- replace with your wallet path
+    const wallet = await Wallets.newFileSystemWallet(walletPath)
+
+    const identity = await wallet.get(userId)
+    if (!identity) {
+        throw new Error(`An identity for the user ${userId} does not exist in the wallet`)
+    }
+
+    const gateway = new Gateway()
+    await gateway.connect(ccp, { wallet, identity: userId, discovery: { enabled: true, asLocalhost: true } })
+
+    const network = await gateway.getNetwork('voting') // <-- replace 'mychannel' with your channel
+    const contract = network.getContract('voting') // <-- replace 'votingcontract' with your chaincode name
+
+    return { gateway, contract }
+}
+
+export default connectToNetwork

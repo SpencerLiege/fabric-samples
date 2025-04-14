@@ -13,34 +13,7 @@ class VotingContract extends Contract {
         super('VotingContract')
         this.electionCount = 0
     }
-    /**
-     * This function registers a new voter
-     * Return the voter ID
-     * @param {Context} ctx the transaction context
-     * @param {String} secretPass the secret pass of the voter
-     * @returns {String} the voter ID
-     */
 
-    async registerVoter(ctx, secretPass) {
-        // Check if the contract options are set to allow the registration of voters
-        await this.CheckInitialized(ctx);
-
-        const voterId = ctx.clientIdentity.getID()
-        // Check if the user already exists
-        const exist = this.userExists(ctx, voterId)
-        if(exist){
-            throw new Error(`User with ID ${voterId} already exists`)
-        }
-
-        const user = {
-            voterId,
-            secretPass,
-            elections: []
-        }
-
-        await ctx.stub.putState(voterId, Buffer.from(JSON.stringify(user)))
-        return { voterId, message: 'User registered successfully' }
-    }
 
     /**
      * This function authenticates a voter
@@ -65,6 +38,37 @@ class VotingContract extends Contract {
     }
 
     // ADMIN FUNCTIONS
+
+    /**
+     * This function registers a new voter
+     * Return the voter ID
+     * @param {Context} ctx the transaction context
+     * @param {String} secretPass the secret pass of the voter
+     * @returns {String} the voter ID
+     */
+
+    async registerVoter(ctx, voterId, secretPass, adminId) {
+        // Check if the contract options are set to allow the registration of voters
+        await this.CheckInitialized(ctx);
+
+        // This modifier checks if admin is calling the function
+        this._onlyAdmin(adminId)
+
+        // Check if the user already exists
+        const exist = this.userExists(ctx, voterId)
+        if (exist) {
+            throw new Error(`User with ID ${voterId} already exists`)
+        }
+
+        const user = {
+            voterId,
+            secretPass,
+            elections: []
+        }
+
+        await ctx.stub.putState(voterId, Buffer.from(JSON.stringify(user)))
+        return { voterId, message: 'User registered successfully' }
+    }
 
     /**
      * This function allows the admin to create a new election(ADMIN ONLY)
